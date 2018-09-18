@@ -1,0 +1,35 @@
+{
+  "name": "banana_farm",
+  "version": "0.1.0",
+  "description": "A Discord bot made for SJBC.",
+  "private": true,
+  "dependencies": {
+    "eris": "^0.9.0",
+    "patron.js": "github:vim2meta/patron.js",
+    "pg": "^7.4.3"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.0",
+    "erlpack": "github:discordapp/erlpack",
+    "zlib-sync": "^0.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^5.6.0"
+  },
+  "scripts": {
+    "lint": "node_modules/.bin/eslint . --ext .js",
+    "test": "npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LJNeon/banana-farm.git"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "eris",
+    "entertainment"
+  ],
+  "author": "ElJay#7711",
+  "license": "AGPL-3.0-only"
+}
