@@ -101,7 +101,6 @@ rules: {
   no-new-wrappers: 2,
   no-new-object: 2,
   no-octal-escape: 2,
-  no-param-reassign: [2, {props: true}],
   no-path-concat: 2,
   no-proto: 2,
   no-return-assign: 2,

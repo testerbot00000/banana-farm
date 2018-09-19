@@ -1,3 +1,7 @@
+incorrectUsage: |-
+  you are incorrectly using this command.
+  **Usage:** `{0}{1}`
+  **Example:** `{0}{2}`
 ping: |-
   **Shard Latency:** {0}
   **Message Read:** {1}

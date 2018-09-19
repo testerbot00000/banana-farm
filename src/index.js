@@ -18,9 +18,9 @@
 "use strict";
 process.env.TZ = "America/Phoenix";
 const data = require("./services/data.js");
-const log = require("./utils/log.js");
 const path = require("path");
 const {RequireAll} = require("patron.js");
+let log;
 process.on("uncaughtException", e => {
   log.error(e);
   process.exit(1);
@@ -34,6 +34,7 @@ function requireAll(dir) {
 }
 (async function() {
   await data.load();
+  log = require("./utils/log.js");
   const client = require("./services/client.js");
   const registry = require("./services/registry.js");
   registry
@@ -44,4 +45,9 @@ function requireAll(dir) {
     .registerCommands(await requireAll("./cmds"));
   await requireAll("./events");
   await client.connect();
-})().catch(log.error);
+})().catch(e => {
+  if(log == null)
+    console.error(e);
+  else
+    log.error(e);
+});

@@ -21,3 +21,9 @@ handler: {}
 
 # patron.js Registry options. See more at: https://vim2meta.github.io/patron.js/global.html#RegistryOptions
 registry: {caseSensitive: false}
+
+# Eris client status options. See more at: https://discordapp.com/developers/docs/topics/gateway#activity-object-activity-structure
+status: {
+  name: "you | .help",
+  type: 3
+}

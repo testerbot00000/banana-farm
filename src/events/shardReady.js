@@ -16,17 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
-const {regexes} = require("../services/data.js");
-module.exports = {
-  escapeMarkdown(str) {
-    return str.replace(regexes.markdown, "\\$&");
-  },
-  format(str, ...args) {
-    return str.replace(regexes.format, (m, i) => args[i]);
-  },
-  list(arr, and = "and") {
-    if(arr.length < 3)
-      return arr.join(and);
-    return `${arr.slice(0, -1).join(", ")}, ${and} ${arr[arr.length - 1]}`;
-  }
-};
+const client = require("../services/client.js");
+const log = require("../utils/log.js");
+client.on("shardReady", i => log.info(`SHARD#${i}_READY`));

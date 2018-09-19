@@ -18,6 +18,7 @@
 "use strict";
 const {colors} = require("./data.js");
 const random = require("../utils/random.js");
+const str = require("../utils/string.js");
 module.exports = {
   create(channel, content, color, file) {
     const canSend = this.verifyChannelPerms(channel);
@@ -65,6 +66,11 @@ module.exports = {
       content: "",
       embed
     };
+  },
+  tag(user, pure = false) {
+    if(pure)
+      return `${user.username}#${user.discriminator}`;
+    return `${str.escapeMarkdown(user.username)}#${user.discriminator}`;
   },
   verifyChannelPerms(channel) {
     if(channel.guild == null)

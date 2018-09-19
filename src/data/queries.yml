@@ -1,0 +1,2 @@
+insertDefault: INSERT INTO {0}({1}) VALUES({2}) ON CONFLICT ({1}) DO NOTHING RETURNING {3}
+selectDefault: SELECT {0} FROM {1} WHERE ({2}) = ({3})
