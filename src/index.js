@@ -16,4 +16,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
-
+process.env.TZ = "America/Phoenix";
+const data = require("./services/data.js");
+const log = require("./utils/log.js");
+const path = require("path");
+const {RequireAll} = require("patron.js");
+process.on("uncaughtException", e => {
+  log.error(e);
+  process.exit(1);
+});
+process.on("unhandledRejection", reason => {
+  log.warn(reason);
+  process.exit(1);
+});
+function requireAll(dir) {
+  return RequireAll(path.join(__dirname, dir));
+}
+(async function() {
+  await data.load();
+  const client = require("./services/client.js");
+  const registry = require("./services/registry.js");
+  registry
+    .registerArgumentPreconditions(await requireAll("./preconditions/arg"))
+    .registerPreconditions(await requireAll("./preconditions/cmd"))
+    .registerTypeReaders(await requireAll("./readers"))
+    .registerGroups(await requireAll("./groups"))
+    .registerCommands(await requireAll("./cmds"));
+  await requireAll("./events");
+  await client.connect();
+})().catch(log.error);

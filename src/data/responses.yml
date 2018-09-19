@@ -1,0 +1,4 @@
+ping: |-
+  **Shard Latency:** {0}
+  **Message Read:** {1}
+  **Reply Sent:** {2}

@@ -29,7 +29,7 @@ rules: {
   implicit-arrow-linebreak: 2,
   indent: [2, 2],
   key-spacing: 2,
-  keyword-spacing": [2, {
+  keyword-spacing: [2, {
     before: false,
     after: true,
     overrides: {
@@ -58,7 +58,6 @@ rules: {
     }
   }],
   linebreak-style: 2,
-  lines-between-class-members: 2,
   max-depth: [2, {max: 3}],
   max-len: [2, {
     tabWidth: 2,
@@ -131,7 +130,10 @@ rules: {
   no-whitespace-before-property: 2,
   no-with: 2,
   nonblock-statement-body-position: [2, "below"],
-  object-curly-newline: [2, {ObjectExpression: {minProperties: 2}}],
+  object-curly-newline: [2, {ObjectExpression: {
+    multiline: true,
+    minProperties: 2
+  }}],
   object-curly-spacing: 2,
   object-shorthand: 2,
   one-var: [2, "never"],
@@ -173,7 +175,7 @@ rules: {
   strict: 2,
   symbol-description: 2,
   template-curly-spacing: 2,
-  wrap-iife: 2,
+  wrap-iife: [2, "inside"],
   yoda: 2
 }
 parserOptions: {ecmaVersion: 2018}
