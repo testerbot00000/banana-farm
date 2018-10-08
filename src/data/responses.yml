@@ -2,7 +2,10 @@ incorrectUsage: |-
   you are incorrectly using this command.
   **Usage:** `{0}{1}`
   **Example:** `{0}{2}`
+
 ping: |-
   **Shard Latency:** {0}
   **Message Read:** {1}
   **Reply Sent:** {2}
+
+profileXp: "{0} have **{1}** XP and a **{2}x** multiplier.{3}"

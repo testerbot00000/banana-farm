@@ -16,6 +16,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
-const client = require("../services/client.js");
-const log = require("../utils/log.js");
-client.on("shardDisconnect", (e, i) => log.error(`SHARD#${i}_DISCONNECT`, e));
+module.exports = {
+  floor(n) {
+    const floored = Math.floor(n);
+    if(Math.abs(n - floored) >= 0.999999991)
+      return n >= 0 ? Math.ceil(n) : floored;
+    return n >= 0 ? floored : Math.ceil(n);
+  },
+  format(num, points = 0) {
+    if(num < 1e3 && num > -1e3)
+      return points === 0 ? this.floor(num) : num.toFixed(points);
+    return num.toLocaleString("en-US", {maximumFractionDigits: 0});
+  }
+};

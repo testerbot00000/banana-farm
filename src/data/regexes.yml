@@ -1,3 +1,11 @@
 format: !!js/regexp /{(\d+)}/g
+
 markdown: !!js/regexp /[<@!#&>:_~*`\\]/g
+
 mention: !!js/regexp /<@!/g
+
+role: !!js/regexp /<@&(\d{14,20})>|^\d{14,20}$/
+
+user: !!js/regexp /<@!?(\d{14,20})>|^\d{14,20}$/
+
+whitespace: !!js/regexp /\s+/g

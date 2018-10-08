@@ -16,6 +16,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
-const client = require("../services/client.js");
-const log = require("../utils/log.js");
-client.on("shardDisconnect", (e, i) => log.error(`SHARD#${i}_DISCONNECT`, e));
+const patron = require("patron.js");
+module.exports = new class InGuild extends patron.ArgumentPrecondition {
+  constructor() {
+    super({name: "in_guild"});
+  }
+  async run(cmd, msg, arg, args, val) {
+    if(msg.channel.guild.members.has(val.id))
+      return patron.PreconditionResult.fromSuccess();
+    return patron.PreconditionResult.fromError(
+      cmd,
+      "this command may only be used on server members."
+    );
+  }
+}();

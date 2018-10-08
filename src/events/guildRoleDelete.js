@@ -17,5 +17,5 @@
  */
 "use strict";
 const client = require("../services/client.js");
-const log = require("../utils/log.js");
-client.on("shardDisconnect", (e, i) => log.error(`SHARD#${i}_DISCONNECT`, e));
+const db = require("../services/database.js");
+client.on("guildRoleDelete", (guild, role) => db.removeXprole(role.id));

@@ -1,2 +1,19 @@
+deleteXproles: DELETE FROM xp_roles WHERE {0}
+
 insertDefault: INSERT INTO {0}({1}) VALUES({2}) ON CONFLICT ({1}) DO NOTHING RETURNING {3}
+
+insertXprole: INSERT INTO xp_roles(guild_id, role_id, unlocked_at) VALUES($1, $2, $3)
+
 selectDefault: SELECT {0} FROM {1} WHERE ({2}) = ({3})
+
+selectGuild: SELECT {0} FROM guilds WHERE id = $1
+
+selectGuildXproles: SELECT * FROM xp_roles WHERE guild_id = $1
+
+selectMember: SELECT {0} FROM members WHERE (guild_id, user_id) = ($1, $2)
+
+selectUser: SELECT {0} FROM users WHERE id = $1
+
+selectXproles: SELECT role_id FROM xp_roles WHERE (guild_id, unlocked_at) = ($1, $2) OR role_id = $3
+
+updateMember: UPDATE members SET {0} WHERE (guild_id, user_id) = ($1, $2)

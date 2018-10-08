@@ -16,6 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
-const client = require("../services/client.js");
-const log = require("../utils/log.js");
-client.on("shardDisconnect", (e, i) => log.error(`SHARD#${i}_DISCONNECT`, e));
+const {TypeReader, TypeReaderResult} = require("patron.js");
+module.exports = new class Int extends TypeReader {
+  constructor() {
+    super({type: "integer"});
+  }
+  async read(cmd, msg, arg, args, val) {
+    const result = Number(val);
+    if(Number.isInteger(result) === true)
+      return TypeReaderResult.fromSuccess(result);
+    return TypeReaderResult.fromError(
+      cmd,
+      "you have provided an invalid integer."
+    );
+  }
+}();

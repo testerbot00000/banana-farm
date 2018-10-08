@@ -16,6 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
-const client = require("../services/client.js");
-const log = require("../utils/log.js");
-client.on("shardDisconnect", (e, i) => log.error(`SHARD#${i}_DISCONNECT`, e));
+const {Group} = require("patron.js");
+module.exports = new class Config extends Group {
+  constructor() {
+    super({
+      description: "Config commands that allow Admins to personalize me.",
+      name: "config",
+      preconditions: ["admin"]
+    });
+  }
+}();

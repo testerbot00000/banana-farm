@@ -16,13 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
+const number = require("./number.js");
 const str = require("./string.js");
 const {times} = require("../services/data.js");
 module.exports = {
   format(ms, detail = 2) {
     const units = ["under a millisecond"];
     for(let i = 0; i < times.length; i++) {
-      const num = Math.floor(ms / times[i].ms % times[i].next);
+      const num = number.floor(ms / times[i].ms % times[i].next);
       if(num !== 0)
         units.splice(0, 1, `${num} ${times[i].name}${num === 1 ? "" : "s"}`);
     }

@@ -16,6 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
-const client = require("../services/client.js");
-const log = require("../utils/log.js");
-client.on("shardDisconnect", (e, i) => log.error(`SHARD#${i}_DISCONNECT`, e));
+const {Precondition, PreconditionResult} = require("patron.js");
+module.exports = new class Admin extends Precondition {
+  constructor() {
+    super({name: "admin"});
+  }
+  async run(cmd, msg) {
+    if(msg.member.permission.has("administrator")
+        || msg.member.permission.has("manageGuild"))
+      return PreconditionResult.fromSuccess();
+    return PreconditionResult.fromError(
+      cmd,
+      "only an Admin may use this command."
+    );
+  }
+}();

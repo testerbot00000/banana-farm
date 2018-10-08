@@ -16,10 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
-const {colors} = require("./data.js");
+const client = require("./client.js");
+const {options: {colors}} = require("./data.js");
 const random = require("../utils/random.js");
 const str = require("../utils/string.js");
 module.exports = {
+  canUseRole(guild, role) {
+    const member = guild.members.get(client.user.id);
+    if(member.permission.has("manageRoles") === false)
+      return false;
+    let highest = 0;
+    for(let i = 0; i < member.roles.length; i++) {
+      const pos = guild.roles.get(member.roles[i]).position;
+      if(pos > highest)
+        highest = pos;
+    }
+    return highest > role.position;
+  },
   create(channel, content, color, file) {
     const canSend = this.verifyChannelPerms(channel);
     if(!canSend)
@@ -37,6 +50,10 @@ module.exports = {
       });
     }
     return channel.createMessage(result, file);
+  },
+  async dm(user, content, color, file) {
+    const channel = await user.getDMChannel();
+    return this.create(channel, content, color, file);
   },
   edit(msg, content) {
     const [{color}] = msg.embeds;
@@ -66,6 +83,18 @@ module.exports = {
       content: "",
       embed
     };
+  },
+  getUser(id) {
+    const user = client.users.get(id);
+    if(user != null)
+      return user;
+    try {
+      return client.getRESTUser(id);
+    }catch(e) {
+      console.log(e);
+      if(e.code !== 10013)
+        throw e;
+    }
   },
   tag(user, pure = false) {
     if(pure)

@@ -22,6 +22,8 @@ const db = require("../services/database.js");
 const handler = require("../services/handler.js");
 const log = require("../utils/log.js");
 const message = require("../services/message.js");
+const number = require("../utils/number.js");
+const random = require("../utils/random.js");
 const {regexes, responses} = require("../services/data.js");
 const str = require("../utils/string.js");
 function handleErrorResult(result) {
@@ -45,26 +47,52 @@ function handleErrorResult(result) {
   }
   return reply;
 }
-async function handleResult(msg, result, prefix) {
-  if(result.success === true
-      || result.commandError === CommandError.CommandNotFound
-      || result.commandError === CommandError.Cooldown)
+async function updateXp(msg) {
+  if(msg.channel.type !== 0)
     return;
-  let reply = `Sorry **${message.tag(msg.author)}**, but`;
-  if(result.commandError === CommandError.Exception) {
+  const {length} = msg.content.replace(regexes.markdown, "")
+    .replace(regexes.whitespace, "");
+  if(length <= 4)
+    return;
+  const now = Date.now();
+  const member = await db.getMember(
+    msg.channel.guild.id,
+    msg.author.id,
+    "xp_amount, xp_cd, xp_mult, xp_total"
+  );
+  if(now - member.xp_cd.getTime() < 45e3)
+    return;
+  else if(now - member.xp_cd.getTime() >= 6e5)
+    member.xp_mult = 1;
+  member.xp_cd = new Date();
+  const gained = number.floor(random.float(3, 5) * member.xp_mult);
+  member.xp_amount += gained;
+  member.xp_total += gained;
+  if(member.xp_mult < 4)
+    member.xp_mult = number.floor((member.xp_mult + 0.1) * 10) / 10;
+  await db.updateMember(msg.channel.guild.id, msg.author.id, member);
+}
+async function handleResult(msg, result, prefix) {
+  let reply = `Sorry **${message.tag(msg.author)}**, but `;
+  if(result.success === true
+      || result.commandError === CommandError.Cooldown) {
+    return;
+  }else if(result.commandError === CommandError.CommandNotFound) {
+    return updateXp(msg);
+  }else if(result.commandError === CommandError.Exception) {
     reply = handleErrorResult(result);
   }else if(result.commandError === CommandError.BotPermission) {
     if(result.errorReason.includes("sendMessages")
         || result.errorReason.includes("embedLinks"))
       return;
-    reply = "I don't have permission to do that.";
+    reply += "I don't have permission to do that.";
   }else if(result.commandError === CommandError.MemberPermission) {
-    reply = "you don't have permission to do that.";
+    reply += "you don't have permission to do that.";
   }else if(result.commandError === CommandError.InvalidContext) {
     if(result.context === Context.Guild)
-      reply = "this command may only be used in DMs.";
+      reply += "this command may only be used in DMs.";
     else
-      reply = "this command may only be used in a server.";
+      reply += "this command may only be used in a server.";
   }else if(result.commandError === CommandError.InvalidArgCount) {
     reply = str.format(
       responses.incorrectUsage,
@@ -75,7 +103,7 @@ async function handleResult(msg, result, prefix) {
   }else if(result.commandError === CommandError.Command
       || result.commandError === CommandError.Precondition
       || result.commandError === CommandError.TypeReader) {
-    reply = result.errorReason;
+    reply += result.errorReason;
   }else if(result.error == null) {
     log.error(result);
     reply = "an unknown error has occured.";
@@ -83,7 +111,7 @@ async function handleResult(msg, result, prefix) {
     log.error(result.error);
     reply = result.error.message;
   }
-  await message.create(msg, reply, "bad");
+  await message.create(msg.channel, reply, "bad");
 }
 client.on("messageCreate", async msg => {
   if(msg.type !== 0 || msg.author.bot || msg.author.discriminator === "0000"
@@ -95,7 +123,7 @@ client.on("messageCreate", async msg => {
     ({prefix} = await db.getGuild(msg.channel.guild.id, "prefix"));
     if(!msg.content.startsWith(prefix)) {
       if(!msg.content.startsWith(client.user.mention))
-        return;
+        return updateXp(msg);
       prefix = client.user.mention;
     }
   }

@@ -17,7 +17,7 @@
  */
 "use strict";
 const {Group} = require("patron.js");
-module.exports = new class Privacy extends Group {
+module.exports = new class Info extends Group {
   constructor() {
     super({
       description: "Basic commands meant to provide helpful information.",

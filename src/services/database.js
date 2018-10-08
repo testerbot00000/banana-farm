@@ -24,44 +24,111 @@ module.exports = {
     const res = await this.pool.query(text, values);
     return res.rows[0];
   },
-  async getGuild(id, columns = "*") {
+  async getGuild(id, cols = "*") {
     const result = await this.getFirstRow(
-      `SELECT ${columns} FROM guilds WHERE id = $1`,
+      str.format(queries.selectGuild, cols),
       [id]
     );
     if(result != null)
       return result;
-    return this.upsert("guilds", "id", [id], columns);
+    return this.upsert("guilds", "id", [id], cols);
+  },
+  async getMember(guildId, userId, cols = "*") {
+    const result = await this.getFirstRow(
+      str.format(queries.selectMember, cols),
+      [guildId, userId]
+    );
+    if(result != null)
+      return result;
+    return this.upsert(
+      "members",
+      "guild_id, user_id",
+      [guildId, userId],
+      cols
+    );
+  },
+  async getUser(id, cols = "*") {
+    const result = await this.getFirstRow(
+      str.format(queries.selectUser, cols),
+      [id]
+    );
+    if(result != null)
+      return result;
+    return this.upsert("users", "id", [id], cols);
+  },
+  async getXproles(guildId) {
+    const {rows} = await this.pool.query(
+      queries.selectGuildXproles,
+      [guildId]
+    );
+    return rows;
   },
   pool: new Pool(),
-  stringifyQuery(count) {
-    const len = count + 2;
-    let values = "$1";
-    for(let i = 2; i < len; i++)
+  async removeXprole(id) {
+    const {rowCount} = await this.pool.query(
+      str.format(queries.deleteXproles, "role_id = $1"),
+      [id]
+    );
+    return rowCount !== 0;
+  },
+  stringifyQuery(count, offset = 2) {
+    const len = count + offset;
+    let values = `$${offset - 1}`;
+    for(let i = offset; i < len; i++)
       values += `, $${i}`;
     return values;
   },
-  async upsert(table, columns, values, returns) {
-    const valStr = this.stringifyQuery(values.length - 1);
-    const selectStr = str.format(
+  async updateMember(guildId, userId, changed) {
+    let count = 3;
+    let cols = "";
+    const vals = [guildId, userId];
+    for(const col in changed) {
+      if(!changed.hasOwnProperty(col))
+        continue;
+      if(cols.length !== 0)
+        cols += ", ";
+      cols += `${col} = $${count}`;
+      vals.push(changed[col]);
+      count++;
+    }
+    await this.pool.query(
+      str.format(queries.updateMember, cols),
+      vals
+    );
+  },
+  async updateXprole(guildId, roleId, xp) {
+    const {rows: roles} = await this.pool.query(
+      queries.selectXproles,
+      [guildId, xp, roleId]
+    );
+    if(roles.length !== 0) {
+      await this.pool.query(str.format(
+        queries.deleteXproles,
+        roles.map(r => `role_id = '${r.roleId}'`).join(" OR ")
+      ));
+    }
+    await this.pool.query(
+      queries.insertXprole,
+      [guildId, roleId, xp]
+    );
+  },
+  async upsert(table, cols, vals, returns) {
+    const valStr = this.stringifyQuery(vals.length - 1);
+    const row = await this.getFirstRow(str.format(
+      queries.insertDefault,
+      table,
+      cols,
+      valStr,
+      returns
+    ), vals);
+    if(row != null)
+      return row;
+    return this.getFirstRow(str.format(
       queries.selectDefault,
       returns,
       table,
-      columns,
+      cols,
       valStr
-    );
-    let row = await this.getFirstRow(selectStr, values);
-    if(row == null) {
-      row = await this.getFirstRow(str.format(
-        queries.insertDefault,
-        table,
-        columns,
-        valStr,
-        returns
-      ), values);
-    }
-    if(row == null)
-      row = await this.getFirstRow(selectStr, values);
-    return row;
+    ), vals);
   }
 };

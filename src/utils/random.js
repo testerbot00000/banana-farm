@@ -16,11 +16,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
+const number = require("./number.js");
 module.exports = {
   element(arr) {
     return arr[this.int(0, arr.length - 1)];
   },
+  float(min, max) {
+    return (Math.random() * (max - min)) + min;
+  },
   int(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    return number.floor(Math.random() * (max - min + 1)) + min;
   }
 };
