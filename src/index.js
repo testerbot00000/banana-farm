@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 "use strict";
-process.env.TZ = "America/Phoenix";
+process.env.TOKEN = "America/Phoenix";
 const data = require("./services/data.js");
 const path = require("path");
 const {RequireAll} = require("patron.js");
